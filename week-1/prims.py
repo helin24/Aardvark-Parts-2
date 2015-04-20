@@ -7,46 +7,39 @@ def prims_min_span_tree(nodes_edge):
     # choose random vertex and add it to set of considered points
     considered = filter(lambda x: x[0] == 1, nodes_edge)
     included_set = [1]
-    print considered 
-    print "is considered initially\n"
 
-    max_node = max(map(lambda x: x[0], nodes_edge))
-    print str(max_node) + "is max node\n"
-   # return
-
-    edge_count = len(nodes_edge)
-    while len(included_set) < 442:
-#    while len(included_set) < max_node:
-        min_node = find_lowest_node(considered)
+    while len(included_set) < 500:
+        min_node = find_lowest_node(considered, included_set)
         print min_node 
         print "is min node\n"
-        new_nodes = filter(lambda x: x[0] == min_node[1], nodes_edge)
-        if len(new_nodes) == 0:
-            considered.append([min_node[1], None, None])
-        else:
-            considered.extend(new_nodes)
-#        print considered 
-#        print "is considered\n"
+	if min_node[0] in included_set:
+	    new_node = min_node[1]
+	    print new_node
+	    print 'is new_node \n'
+	else:
+	    new_node = min_node[0]
+        new_nodes = filter(lambda x: x[0] == new_node or x[1] == new_node, nodes_edge)
+	considered.extend(new_nodes) # get unique nodes instead
+        print considered 
+        print "is considered\n"
         span_length += min_node[2]
-        included_set.append(min_node[1])
+        included_set.append(new_node)
         print str(span_length) + " is span length\n"
 
-def find_lowest_node(nodes):
-    included_nodes = set(map(lambda x: x[0], nodes))
+def find_lowest_node(nodes, included_nodes):
     print included_nodes
+    print len(included_nodes)
     print 'is included nodes length\n'
-    min_node = nodes[0]
-    nodes_copy = list(nodes)
-    for node in nodes_copy:
-        if node[1] in included_nodes:
+    min_node = []
+    for node in nodes:
+        if node[0] in included_nodes and node[1] in included_nodes:
             None
-#            nodes_copy.remove(node)
-#            print "%(s)s %(t)s in included nodes\n" % {'s': node[0], 't': node[1]}
-        else:
-#            print "comparing %(val1)s against %(val2)s" % {'val1': str(node[0]) + ', ' + str(node[1]) + ': ' + str(node[2]), 'val2': min_node[2]}
-            if node[2] < min_node[2] and node[2] <> None:
-                min_node = node
-    return min_node
+	else:
+	    if min_node == []:
+		min_node.append(node)
+	    elif node[2] < min_node[0][2]:
+		min_node[0] = node
+    return min_node[0]
 
 def read_nodes_edge_file(file):
     nodes_edge = []
@@ -57,4 +50,5 @@ def read_nodes_edge_file(file):
     return [[int(num) for num in elem] for elem in nodes_edge]
 
 nodes_edge = read_nodes_edge_file('edges.txt')
+# nodes_edge = read_nodes_edge_file('test_edge.txt')
 prims_min_span_tree(nodes_edge)
