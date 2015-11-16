@@ -1,3 +1,5 @@
+import collections
+
 def knapsack(txt_file):
     f = open(txt_file)
 
@@ -35,8 +37,37 @@ def knapsack(txt_file):
     return index[1][size]
         
     
-    # could only examine every 100 of knapsack space?
-    
+    # record weight:value pairs 
+
+# def faster_knapsack(txt_file):
+#     f = open(txt_file)
+# 
+#     first_line = f.readline().split(' ')
+#     knapsack_size = int(first_line[0])
+#     number_of_items = int(first_line[1][:-1])
+# 
+#     previous = collections.OrderedDict()
+#     current = collections.OrderedDict()
+# 
+#     for item in range(number_of_items):
+#         print item
+#         line = f.readline().split(' ')
+#         value, weight = int(line[0]), int(line[1][:-1])
+#         
+#         if item == 0:
+#             if weight <= knapsack_size:
+#                 current[weight] = value
+#             else:
+#                 current[knapsack_size] = 0
+#         else:
+#             prev_value = 0
+#             for breakpoint in previous:
+#                 if weight < breakpoint[0]:
+#                     current[weight] = value
+# 
+#                 prev_value = breakpoint[1] # or whatever it should be
+
+
 
 
 
