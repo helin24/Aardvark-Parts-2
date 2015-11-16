@@ -2,15 +2,17 @@ def max_spacing(k, filename):
     e = EdgeHeap(filename)
     uf = UnionFind(e.node_count())
     print uf.cluster_count
+    count = 1
 
     while uf.cluster_count > k:
+        print count
+        count += 1
         length, node1, node2 = e.remove()
-        print "uniting %s and %s" % (node1, node2)
+        print "uniting %s and %s with distance of %s" % (node1, node2, length)
         print uf.union(node1, node2)
 
-    print e.show_array()
-
-    # {1: 1 or 1 points to [1, 2, 3] and then 2:1 3:1} so then can search what pointer a node has (or is itself)
+    print uf.get_clusters()
+    return e.show_array()[0]
 
 
 class UnionFind:
@@ -25,19 +27,22 @@ class UnionFind:
         print "x parent and y parent are %s and %s" % (x_parent, y_parent)
         if x_parent == y_parent:
             return False
-        x_count, y_count = self.count_children(x), self.count_children(y)
+        x_count, y_count = self.count_children(x_parent), self.count_children(y_parent)
+        print "x's parent has %s children and y's parent has %s children" % (x_count, y_count)
         if x_count >= y_count:
-            self.clusters[x].extend(self.clusters[y])
+            self.clusters[x_parent].extend(self.clusters[y_parent])
             if y_count > 0:
-                children = self.clusters[y]
+                children = self.clusters[y_parent]
                 for child_node in children:
-                    self.clusters[child_node] = [x]
+                    self.clusters[child_node] = [x_parent]
         else:
-            self.clusters[y].extend(self.clusters[x])
+            self.clusters[y_parent].extend(self.clusters[x_parent])
             if x_count > 0:
-                children = self.clusters[x]
+                children = self.clusters[x_parent]
                 for child_node in children:
-                    self.clusters[child_node] = [y]
+                    self.clusters[child_node] = [y_parent]
+        new_x_p, new_y_p = self.find_parent(x), self.find_parent(y)
+        print "new x parent and y parent are %s and %s" % (new_x_p, new_y_p)
         self.cluster_count -= 1
         return True
         
@@ -54,6 +59,16 @@ class UnionFind:
             return 0
         else:
             return len(parent_or_children)
+
+    def get_clusters(self):
+        clusters = []
+        for node in self.clusters.keys():
+            potential_cluster = self.clusters[node]
+            if potential_cluster == [node] or len(potential_cluster) > 1:
+                clusters.append(sorted(potential_cluster))
+        
+        return clusters
+
 
 
     # open file
@@ -130,5 +145,7 @@ class EdgeHeap:
     
 
 
-max_spacing(4, 'clustering1.txt')
+# print max_spacing(4, 'clustering1.txt')
+print max_spacing(4, 'small_cluster.txt')
+print max_spacing(3, 'linear_cluster.txt')
 
