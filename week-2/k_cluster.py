@@ -11,8 +11,11 @@ def max_spacing(k, filename):
         print "uniting %s and %s with distance of %s" % (node1, node2, length)
         print uf.union(node1, node2)
 
-    print uf.get_clusters()
-    return e.show_array()[0]
+    length, node1, node2 = e.remove()
+    while not uf.union(node1, node2):
+        length, node1, node2 = e.remove()
+
+    return length, node1, node2
 
 
 class UnionFind:
@@ -145,7 +148,7 @@ class EdgeHeap:
     
 
 
-# print max_spacing(4, 'clustering1.txt')
+print max_spacing(4, 'clustering1.txt')
 print max_spacing(4, 'small_cluster.txt')
 print max_spacing(3, 'linear_cluster.txt')
 
