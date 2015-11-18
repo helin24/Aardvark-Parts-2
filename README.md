@@ -1,0 +1,1 @@
+Algorithms from an online course, with name obscured to be less searchable. If you find this, figure out the source, and want to use my answers for the course, consider using stackoverflow instead for likely more elegant solutions.
