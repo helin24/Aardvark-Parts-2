@@ -1,21 +1,72 @@
+import time
+
 def max_spacing(k, filename):
     e = EdgeHeap(filename)
     uf = UnionFind(e.node_count())
-    print uf.cluster_count
-    count = 1
 
     while uf.cluster_count > k:
-        print count
-        count += 1
         length, node1, node2 = e.remove()
-        print "uniting %s and %s with distance of %s" % (node1, node2, length)
-        print uf.union(node1, node2)
+        # print "uniting %s and %s with distance of %s" % (node1, node2, length)
+        # print uf.union(node1, node2)
+        uf.union(node1, node2)
 
     length, node1, node2 = e.remove()
     while not uf.union(node1, node2):
         length, node1, node2 = e.remove()
 
     return length, node1, node2
+
+class Node:
+    def __init__(self, parent, value):
+        self.parent = parent
+        if parent:
+            self.num_so_far = parent.get_num() + value
+        else:
+            self.num_so_far = ''
+        self.children = []
+
+    def add_child(self, child):
+        self.children.append(child)
+
+    def get_num(self):
+        return self.num_so_far
+
+    def go_to_child(self, value):
+        for child in self.children:
+            if child.get_num()[-1] == value:
+                return child
+        return False
+
+
+class Trie:
+    def __init__(self, filename):
+        self.top_node = Node(None, None)
+        f = open(filename)
+        f.readline()
+        count = 0
+        for line in f:
+            print count
+            count += 1
+            current_node = self.top_node
+            for bit in line.split():
+                # if has child with value go to that child
+                # else make that child
+                next_node = current_node.go_to_child(bit)
+                if next_node:
+                    current_node = next_node
+                else:
+                    current_node.add_child(Node(current_node, bit))
+
+    def find_node(bin_str):
+        current_node = self.top_node
+        for bit in bin_str:
+            next_node = current_node.go_to_child(bit)
+            if next_node:
+                current_node = next_node
+            else:
+                return False
+
+        return current_node
 
 
 class UnionFind:
@@ -27,11 +78,10 @@ class UnionFind:
 
     def union(self, x, y):
         x_parent, y_parent = self.find_parent(x), self.find_parent(y)
-        print "x parent and y parent are %s and %s" % (x_parent, y_parent)
+        # print "x parent and y parent are %s and %s" % (x_parent, y_parent)
         if x_parent == y_parent:
             return False
         x_count, y_count = self.count_children(x_parent), self.count_children(y_parent)
-        print "x's parent has %s children and y's parent has %s children" % (x_count, y_count)
         if x_count >= y_count:
             self.clusters[x_parent].extend(self.clusters[y_parent])
             if y_count > 0:
@@ -44,8 +94,6 @@ class UnionFind:
                 children = self.clusters[x_parent]
                 for child_node in children:
                     self.clusters[child_node] = [y_parent]
-        new_x_p, new_y_p = self.find_parent(x), self.find_parent(y)
-        print "new x parent and y parent are %s and %s" % (new_x_p, new_y_p)
         self.cluster_count -= 1
         return True
         
@@ -73,20 +121,16 @@ class UnionFind:
         return clusters
 
 
-
-    # open file
-    # make heap of edges based on their length (smallest to top)
-        # edge length
-
-
 class EdgeHeap:
     def __init__(self, filename):
+        start = time.time()
         f = open(filename)
         self.array = []
         self.nodes_count = int(f.readline()[:-1])
         for line in f:
             node1, node2, length = (int(x) for x in line[:-1].split(' '))
             self.insert(node1, node2, length)
+        print "time to make heap is %s" % (time.time() - start)
 
     def show_array(self):
         return self.array[:50]
@@ -147,8 +191,11 @@ class EdgeHeap:
 
     
 
+# start = time.time()
+# print max_spacing(4, 'clustering1.txt')
+# print time.time() - start
+# 
+# print max_spacing(4, 'small_cluster.txt')
+# print max_spacing(3, 'linear_cluster.txt')
 
-print max_spacing(4, 'clustering1.txt')
-print max_spacing(4, 'small_cluster.txt')
-print max_spacing(3, 'linear_cluster.txt')
-
+t = Trie('clustering_big.txt')
