@@ -16,57 +16,65 @@ def max_spacing(k, filename):
 
     return length, node1, node2
 
+
+def max_spacing_big(k, filename):
+    t = Trie()
+
+    f = open(filename)
+    f.readline()
+    count = 0
+    for line in f:
+        if count % 100 == 0:
+            print count
+        # if count > 20000:
+        #     break
+        count += 1
+        t.insert_node(line)
+
+    print t.find_node('111000001101001111001111')
+
+
+
 class Node:
     def __init__(self, parent, value):
         self.parent = parent
-        if parent:
-            self.num_so_far = parent.get_num() + value
-        else:
-            self.num_so_far = ''
+        self.value = value
         self.children = []
 
     def add_child(self, child):
         self.children.append(child)
 
-    def get_num(self):
-        return self.num_so_far
-
     def go_to_child(self, value):
         for child in self.children:
-            if child.get_num()[-1] == value:
+            if child.value == value:
                 return child
         return False
 
 
 class Trie:
-    def __init__(self, filename):
+    def __init__(self):
         self.top_node = Node(None, None)
-        f = open(filename)
-        f.readline()
-        count = 0
-        for line in f:
-            print count
-            count += 1
-            current_node = self.top_node
-            for bit in line.split():
-                # if has child with value go to that child
-                # else make that child
-                next_node = current_node.go_to_child(bit)
-                if next_node:
-                    current_node = next_node
-                else:
-                    current_node.add_child(Node(current_node, bit))
 
-    def find_node(bin_str):
+    def insert_node(self, bit_str):
         current_node = self.top_node
-        for bit in bin_str:
-            next_node = current_node.go_to_child(bit)
+        for bit in bit_str.split():
+            next_node = current_node.go_to_child(int(bit))
+            if not next_node:
+                next_node = Node(current_node, int(bit))
+                current_node.add_child(next_node)
+            current_node = next_node
+
+
+    def find_node(self, bin_str):
+        current_node = self.top_node
+        for bit in bin_str[:-1]:
+            next_node = current_node.go_to_child(int(bit))
             if next_node:
                 current_node = next_node
             else:
                 return False
 
-        return current_node
+        return current_node.go_to_child(int(bin_str[-1]))
 
 
 class UnionFind:
@@ -96,7 +104,7 @@ class UnionFind:
                     self.clusters[child_node] = [y_parent]
         self.cluster_count -= 1
         return True
-        
+
     def find_parent(self, node):
         parent_or_children = self.clusters[node]
         if len(parent_or_children) == 1:
@@ -117,9 +125,8 @@ class UnionFind:
             potential_cluster = self.clusters[node]
             if potential_cluster == [node] or len(potential_cluster) > 1:
                 clusters.append(sorted(potential_cluster))
-        
-        return clusters
 
+        return clusters
 
 class EdgeHeap:
     def __init__(self, filename):
@@ -153,7 +160,7 @@ class EdgeHeap:
         self.array[0] = new_value
         current_index = 0
         left_index, right_index = self.child_indices(current_index)
-        
+
         while left_index:
             swap_index = None
             if self.array[left_index] < new_value:
@@ -169,7 +176,7 @@ class EdgeHeap:
                 break
 
         return top_node
-        
+
 
     def parent_index(self, index):
         p = (index - 1) / 2
@@ -189,13 +196,13 @@ class EdgeHeap:
         self.array[index1] = self.array[index2]
         self.array[index2] = temp
 
-    
+
 
 # start = time.time()
 # print max_spacing(4, 'clustering1.txt')
 # print time.time() - start
-# 
+#
 # print max_spacing(4, 'small_cluster.txt')
 # print max_spacing(3, 'linear_cluster.txt')
 
-t = Trie('clustering_big.txt')
+max_spacing_big(4, 'clustering_big.txt')
